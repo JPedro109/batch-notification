@@ -140,4 +140,46 @@ Em seguida, execute o comando abaixo:
 docker-compose up -d
 ```
 
-Observação: Não foram adicionadas lógicas de envio das notificações pois entende-se que não era o intuito.
+Após os containers, vá até esse host
+```sh
+http://localhost:15672/#/
+```
+
+Agora siga os seguintes passos:
+- Logue-se com user = guest e password = guest
+- Vá até a aba Queues and Streams
+- Acesse a queue notification
+
+Agora você pode testar a aplicação utilizado esse dois bodies:
+
+```sh
+{
+    "channel": "SMS",
+    "name": "PROMOTION",
+    "data": {
+        "name": "Test",
+        "link": "https://domain.com/publish"
+    },
+    "userId": "10128862-a940-465e-93ab-e7627651eab9",
+    "target": "11999999999"
+}
+```
+
+```sh
+{
+    "channel": "EMAIL",
+    "name": "PROMOTION",
+    "data": {
+        "name": "Test",
+        "link": "https://domain.com/publish"
+    },
+    "userId": "10128862-a940-465e-93ab-e7627651eab9",
+    "target": "email@test.com"
+}
+```
+---
+
+### Observação
+
+- Não foram adicionadas lógicas de envio das notificações pois entende-se que não era o intuito.
+- Se a aplicação for reiniciado a variável de ambiente SPRING_SQL_INIT_MODE, deve ser modificado para never.
