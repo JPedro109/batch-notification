@@ -182,4 +182,4 @@ Agora você pode testar a aplicação utilizado esse dois bodies:
 ### Observação
 
 - Não foram adicionadas lógicas de envio das notificações pois entende-se que não era o intuito.
-- Se a aplicação for reiniciado a variável de ambiente SPRING_SQL_INIT_MODE, deve ser modificado para never.
+- Se a aplicação for reiniciada a variável de ambiente SPRING_SQL_INIT_MODE, deve ser modificado para never.
