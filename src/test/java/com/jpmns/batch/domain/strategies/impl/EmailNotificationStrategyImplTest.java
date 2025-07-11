@@ -32,7 +32,8 @@ class EmailNotificationStrategyImplTest {
     @Test
     void shouldSendEmailIfTemplateExistsInRepository() throws Exception {
         when(event.name()).thenReturn("WELCOME");
-        when(cache.get("WELCOME")).thenReturn(Optional.empty());
+        when(event.channel()).thenReturn("EMAIL");
+        when(cache.get("EMAIL-WELCOME")).thenReturn(Optional.empty());
 
         EmailTemplateEntity template = new EmailTemplateEntity();
         when(emailTemplateRepository.findByNameAndActiveTrue("WELCOME"))
@@ -40,7 +41,7 @@ class EmailNotificationStrategyImplTest {
 
         assertDoesNotThrow(() -> strategy.send(event));
 
-        verify(cache).get("WELCOME");
+        verify(cache).get("EMAIL-WELCOME");
         verify(emailTemplateRepository).findByNameAndActiveTrue("WELCOME");
         verify(cache).set("WELCOME", template);
     }
@@ -48,14 +49,15 @@ class EmailNotificationStrategyImplTest {
     @Test
     void shouldThrowExceptionIfTemplateDoesNotExistAnywhere() {
         when(event.name()).thenReturn("NOT_FOUND");
-        when(cache.get("NOT_FOUND")).thenReturn(Optional.empty());
+        when(event.channel()).thenReturn("EMAIL");
+        when(cache.get("EMAIL-NOT_FOUND")).thenReturn(Optional.empty());
         when(emailTemplateRepository.findByNameAndActiveTrue("NOT_FOUND"))
                 .thenReturn(Optional.empty());
 
         Exception e = assertThrows(Exception.class, () -> strategy.send(event));
         assertEquals("Template is not found", e.getMessage());
 
-        verify(cache).get("NOT_FOUND");
+        verify(cache).get("EMAIL-NOT_FOUND");
         verify(emailTemplateRepository).findByNameAndActiveTrue("NOT_FOUND");
         verify(cache, never()).set(any(), any());
     }
@@ -63,12 +65,13 @@ class EmailNotificationStrategyImplTest {
     @Test
     void shouldUseTemplateFromCacheAndNotCallRepository() throws Exception {
         when(event.name()).thenReturn("CACHED");
+        when(event.channel()).thenReturn("EMAIL");
         EmailTemplateEntity cachedTemplate = new EmailTemplateEntity();
-        when(cache.get("CACHED")).thenReturn(Optional.of(cachedTemplate));
+        when(cache.get("EMAIL-CACHED")).thenReturn(Optional.of(cachedTemplate));
 
         assertDoesNotThrow(() -> strategy.send(event));
 
-        verify(cache).get("CACHED");
+        verify(cache).get("EMAIL-CACHED");
         verifyNoInteractions(emailTemplateRepository);
     }
 }

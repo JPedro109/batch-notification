@@ -32,7 +32,8 @@ class SMSNotificationStrategyImplTest {
     @Test
     void shouldSendSMSIfTemplateExistsInRepository() throws Exception {
         when(event.name()).thenReturn("OTP_SMS");
-        when(cache.get("OTP_SMS")).thenReturn(Optional.empty());
+        when(event.channel()).thenReturn("SMS");
+        when(cache.get("SMS-OTP_SMS")).thenReturn(Optional.empty());
 
         SMSTemplateEntity template = new SMSTemplateEntity();
         when(smsTemplateRepository.findByNameAndActiveTrue("OTP_SMS"))
@@ -40,7 +41,7 @@ class SMSNotificationStrategyImplTest {
 
         assertDoesNotThrow(() -> strategy.send(event));
 
-        verify(cache).get("OTP_SMS");
+        verify(cache).get("SMS-OTP_SMS");
         verify(smsTemplateRepository).findByNameAndActiveTrue("OTP_SMS");
         verify(cache).set("OTP_SMS", template);
     }
@@ -48,14 +49,15 @@ class SMSNotificationStrategyImplTest {
     @Test
     void shouldThrowExceptionIfTemplateDoesNotExistAnywhere() {
         when(event.name()).thenReturn("UNKNOWN_SMS");
-        when(cache.get("UNKNOWN_SMS")).thenReturn(Optional.empty());
+        when(event.channel()).thenReturn("SMS");
+        when(cache.get("SMS-UNKNOWN_SMS")).thenReturn(Optional.empty());
         when(smsTemplateRepository.findByNameAndActiveTrue("UNKNOWN_SMS"))
                 .thenReturn(Optional.empty());
 
         Exception e = assertThrows(Exception.class, () -> strategy.send(event));
         assertEquals("Template is not found", e.getMessage());
 
-        verify(cache).get("UNKNOWN_SMS");
+        verify(cache).get("SMS-UNKNOWN_SMS");
         verify(smsTemplateRepository).findByNameAndActiveTrue("UNKNOWN_SMS");
         verify(cache, never()).set(any(), any());
     }
@@ -63,12 +65,13 @@ class SMSNotificationStrategyImplTest {
     @Test
     void shouldUseTemplateFromCacheAndNotCallRepository() throws Exception {
         when(event.name()).thenReturn("CACHED_SMS");
+        when(event.channel()).thenReturn("SMS");
         SMSTemplateEntity cachedTemplate = new SMSTemplateEntity();
-        when(cache.get("CACHED_SMS")).thenReturn(Optional.of(cachedTemplate));
+        when(cache.get("SMS-CACHED_SMS")).thenReturn(Optional.of(cachedTemplate));
 
         assertDoesNotThrow(() -> strategy.send(event));
 
-        verify(cache).get("CACHED_SMS");
+        verify(cache).get("SMS-CACHED_SMS");
         verifyNoInteractions(smsTemplateRepository);
     }
 }
